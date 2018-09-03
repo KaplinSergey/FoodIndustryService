@@ -59,21 +59,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scenarios\Order.feature.cs">
+    <Compile Include="Scenarios\Orders.feature.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Order.feature</DependentUpon>
+      <DependentUpon>Orders.feature</DependentUpon>
     </Compile>
+    <Compile Include="Steps\OrdersSteps.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Steps\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Scenarios\Order.feature">
+    <None Include="Scenarios\Orders.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>Order.feature.cs</LastGenOutput>
+      <LastGenOutput>Orders.feature.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
