@@ -4,6 +4,7 @@ using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 using System.Collections.Generic;
 using System.Linq;
+using  Moq;
 
 namespace FoodIndustryService.Core.Tests.Steps
 {
@@ -13,12 +14,13 @@ namespace FoodIndustryService.Core.Tests.Steps
     [When(@"I press add order and set customer info")]
     public void WhenIPressAddOrderAndSetCustomerInfo(Table table)
     {
-      OrderSystem orderSystem = new OrderSystem();
       OrderCart orderCard = ScenarioContext.Current.Get<OrderCart>("foodOrderCart");
       orderCard.CustomerName = table.Rows[0]["Name"];
-      orderSystem.AddOrder(orderCard);
 
-      ScenarioContext.Current.Set(orderSystem, "orderSystem");
+      Mock<IOrderSystem> orderSystem = new Mock<IOrderSystem>();
+      orderSystem.Setup(o => o.GetFoodOrder(It.IsAny<string>())).Returns((string customerName) => new FoodOrder(orderCard.CustomerName, orderCard.Items));
+
+      ScenarioContext.Current.Set(orderSystem.Object, "orderSystem");
     }
 
 
@@ -77,13 +79,19 @@ namespace FoodIndustryService.Core.Tests.Steps
     [Then(@"the Order should be added on the Orders system")]
     public void ThenTheOrderShouldBeAddedOnTheOrdersSystem(Table table)
     {
-      OrderSystem orderSystem = ScenarioContext.Current.Get<OrderSystem>("orderSystem");
+      IOrderSystem orderSystem = ScenarioContext.Current.Get<IOrderSystem>("orderSystem");
       FoodOrder order = orderSystem.GetFoodOrder(table.Rows[0]["CustomerName"]);
 
       IEnumerable<FoodOrderItem> foodOrderItems = table.CreateSet<FoodOrderItem>();
 
       Assert.That(order.Items, Is.EquivalentTo(foodOrderItems));
     }
+  }
+
+  public interface IOrderSystem
+  {
+    FoodOrder GetFoodOrder(string customerName);
+    void AddOrder(OrderCart orderCart);
   }
 
   public class OrderCart
@@ -110,6 +118,11 @@ namespace FoodIndustryService.Core.Tests.Steps
     public bool RemoveItem(FoodOrderItem foodOrderItem)
     {
       return _foodOrderItems.Remove(foodOrderItem);
+    }
+
+    public decimal CalculatePrice(decimal discount)
+    {
+      return this.CalculatePrice() * (1 - discount / 100M);
     }
 
     public decimal CalculatePrice()
